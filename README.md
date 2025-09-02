@@ -5,5 +5,3 @@ this repository contains my Python programming exercises and projects.
 - Name: Kai Broviak
 - Course: CS1350 Computer Science II
 - School: Indiana Institute of Technology
-
-g
