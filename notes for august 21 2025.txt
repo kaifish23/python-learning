@@ -1,0 +1,96 @@
+#what is a Dictionary?
+    #a dictionary is a mutable collection of key-value pairs
+    #aka "associative arrays", "hash maps", or "hash tables"
+    #implements an Abstract Data Type (ADT) called "mapping"
+    #keys must be immutable and unique
+    #values can be any data type and can be duplicated
+
+#Abstract Data Type (ADT) Persepctive 
+    #Insert(key, value): add a key-value pair
+    #Lookup(key): retrieve value associated with key
+    #Delete(key): remove key-value pair
+    #Update(key, value): modify value for existing key
+
+#Internal Implementation (Hash Table)
+#Key > Hash Function > Index > Bucket > Value 
+
+#Hash Function Properties
+    #Deterministic: same key always produces the same hash
+    #Uniform Distribution: minimizes collisions
+        #collision: two hash keys equal same value
+            #ex: key=1 / h("apple") = 1 & h("banana") = 1 also
+            #to fix it: python uses a psuedorandom sequence; it would go to 1 then 20 then 13, etc. 
+            #therefore making apple = 1, banana = 20, lime = 13, etc.
+    #Fast Computation: O(1) time complexity
+
+#Collision Resolution: python uses open addressing with random probing
+    #1. if bucket is occupied, probe next question
+    #2. use pseudorandom sequence to find alternative positions
+    #3. maintains load factor < 2/3 to ensure performance
+
+#Why use dictionaries? (Computational Complexity)
+
+#Time Complexity Analysis
+    #table header - operation / dictionary / list / sorted list
+        #search / O(1) avg, O(n) worst / O(n) / O(log n)
+        #insert /  O(1) avg, O(n) worst / O(1) append, O(n) insert / O(n)
+        #delete /  O(1) avg, O(n) worst / O(n) / O(n)
+        #update /  O(1) avg, O(n) worst / O(1) if index known / O(n)
+
+#Space Complexity
+    #Space: O(n) where n is number of key-value pairs
+    #Load Factor: ratio of entries to available slots
+    #Dynamic Resizing: automatically grows/shrinks to maintain performance
+
+#Data Structure Property
+    #Associative Property
+        student_grades['Mathematics'] = 95
+        grades_list[0] = 95
+    #Uniqueness Constraint
+        scores = {'Alice':85} 
+        scores = ['Alice'] = 90 #overwrites previous value
+        print(scores) #prints {'Alice':90}
+    #Immutable Key Requirement
+        valid_dict = {
+
+        }
+
+#Load Factor Impact
+    #Low Load Factor: (< 0.5): wastes memory, fast lookup
+    #Optimal Load Factor: (0.67): balance of speed and memory
+    #High Load Factor (> 0.8): more collisions, slower operations
+
+#Real World Analogies and Applications
+
+#Computer Science Applications
+    #Symbol Tables: variable names -> memory addresses in compilers
+    #Caching: URLs -> cached web pages
+    #Database Indexing: primary keys -> record locations
+    #Routing Tables: IP addresses -> next hop destinations
+
+#Creating Dictionaries
+    #Literal Syntax
+        empty_dict = {} #empty dictionary
+        #dictionary with initial values
+        student = {
+            'name': 'Alice Johnson',
+            'id': 12345,
+            'gpa': 3.8,
+            'major': 'Computer Science'
+        }
+        #mixed data types
+        mixed_dict = {
+            'string_key':'Hello',
+            42:'Integer key',
+            3.14:'Float key',
+            True:'Boolean key'
+        }
+    #dict() constructor
+        #from keyword arguements
+            student = dict(name = 'Alice Johnson', id = 12345, gpa = 2.8)
+        #from list of tuples
+            grades = dict([('Math', 95), ('Science', 87), ('English', 92)])
+        #from zip of two lists
+            subjects = ['Math', 'Science', 'English']
+            scores = [95, 87, 92]
+            grade_dict = dict(zip(subjects, scores))
