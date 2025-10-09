@@ -1,0 +1,3 @@
+& C:/Users/kaile/AppData/Local/Programs/Python/Python313/python.exe "c:/Users/kaile/Desktop/PythonCS2/midterm practice.py"
+& C:/Users/kaile/AppData/Local/Programs/Python/Python313/python.exe "c:/Users/kaile/Desktop/PythonCS2/midterm practice.py"
+n

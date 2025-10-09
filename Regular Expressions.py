@@ -60,13 +60,53 @@ matches = re.findall(pattern, text)
 print("="*20)
 print(f"Non-alphabetic characters: {matches}")
 
-#Unit 3: Shorthand Character Classes
+#Unit 3: Shorthand Character Classes, Metacharacters & Quantifiers
 #\d = [0-9]
 #\D = [^0-9]
 #\w = any word character [a-zA-Z0-9_]
 #\W = [^a-zA-Z0-9_]
 #\s = any whitespace
 #\S = any non-whitespace
+#Metacharacters
+    #(.) = wildcard 
+        #Matches ANY single character except newline
+        #Like a blank tile in Scrabble
+        #Example: a.c matches "abc", "a1c", "a c", etc.
+    #(^) = start anchor
+        #Matches the beginning of a string
+        #Does NOT consume characters
+        #Example: ^Hello matches "Hello world" but not "Say Hello
+    #($) = end anchor
+        #Matches the end of a string
+        #Does NOT consume characters
+        #Example: world$ matches "Hello world" but not "world peace"
+#Combining Anchors
+    #^Hello$ matches ONLY the exact string "Hello"
+    #^\d+$ matches strings that contain ONLY digits
+#Escaping Metacharacters
+    #\ escapes it and will only match the literal character (\. only matches ".")
+#Quantifiers
+    #(*) = Zero or More
+        #Matches 0 or more of the preceding character/group
+        #ab*c matches "ac", "abc", "abbc", "abbbc", etc.
+        #Always matches (even if 0 occurrences)
+    #(+) = One or more
+        #Matches 1 or more of the preceding character/group
+        #ab+c matches "abc", "abbc", "abbbc" but NOT "ac"
+        #Must have at least one occurrence
+    #(?) = Zero or one (optional)
+        #Matches 0 or 1 of the preceding character/group
+        #colou?r matches both "color" and "colour"
+        #Makes the preceding element optional
+#Combining with Character Classes
+    #\d* - Zero or more digits
+    #\d+ - One or more digits (at least one required)
+    #\d? - Zero or one digit (optional single digit
+#Common Patterns:
+    #\d+ - Whole numbers
+    #\w+ - Words
+    #\s* - Optional whitespace
+    #.+ - Any non-empty string
 
 #Exercise 1c: Count how many digits are in the text
 text = "I have 2 cats and 3 dogs"
@@ -447,3 +487,85 @@ for match in re.finditer(pattern, text):
     concordance.setdefault(word, []).append(position)
 print(concordance)
 
+# Week 6 Lecture 2: Unit 3: re.sub() function
+#re.sub() =  Replaces occurrences of pattern with replacement
+#re.sub(pattern, replacement, string, count=0, flags=0)
+#Replacement Options:
+    #Static string: re.sub(r"\d+", "X", text)
+    #Backreferences: re.sub(r"(\w+) (\w+)", r"\2, \1", text)
+    #Function: re.sub(r"\d+", lambda m: str(int(m.group())*2), text)
+#Backreference Syntax:
+    #\1, \2, etc. - Refer to captured groups
+    #\g<1>, \g<2> - Alternative syntax
+    #\g<name> - Named group reference
+
+#Exercise 3a: Replace all spaces with underscores
+print("="*30)
+text = "Convert this to snake case"
+pattern = r"\s"
+replacement = "_"
+result = re.sub(pattern, replacement, text)
+print(f"Snake case: {result}")
+
+#Exercise 3b: Mask email addresses (keep first letter and domain)
+print("="*30)
+text = "Contact john@example.com or mary@company.org"
+pattern = r"\b(\w)\w*(@\w+\.\w+)"
+replacement = r"\1***\2"
+result = re.sub(pattern, replacement, text)
+print(f"Censored emails: {result}")
+
+#Exercise 3c: Convert markdown links to HTML
+print("="*30)
+text = "Check [Google](https://google.com) and [GitHub](https://github.com)"
+pattern = r"\[(.+?)\]\((.+?)\)"
+replacement = r'<a href="\2">\1</a>'
+result = re.sub(pattern, replacement, text)
+print(f"HTML text: {result}")
+
+#Week 6 Lesson 2: Unit 4: Compilation
+#re.compile() = creates a reusable pattern object
+
+#Exercise 4a: Compile a pattern to find all words starting with 'c'
+print("="*30)
+text = "The cat chased the clever mouse carefully"
+pattern = re.compile(r"c\w*")
+matches = pattern.findall(text)
+print(f"C words: {matches}")
+
+#Exercise 4b: Create a validation class with compiled patterns
+print("="*30)
+class Validator:
+    email = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    phone = re.compile(r"^\d{10}$")
+    zipcode = re.compile(r"^\d{5}$")
+    @staticmethod
+    def is_valid_email(text):
+        return bool(Validator.email.match(text))
+    def is_valid_phone(text):
+        return bool(Validator.phone.match(text))
+    def is_valid_zip(text):
+        return bool(Validator.zipcode.match(text))
+    
+print(Validator.is_valid_email("john.doe@example.com"))
+print(Validator.is_valid_email("not-areal-email"))
+print(Validator.is_valid_phone("3172738255"))
+print(Validator.is_valid_phone("1-800-273-8255"))
+print(Validator.is_valid_zip("46036"))
+print(Validator.is_valid_zip("460360"))
+
+#Exercise 4c: Create a text processor with multiple compiled patterns
+print("="*30)
+class TextProcessor:
+    def __init__(self):
+        #urls to links
+        self.URL = re.compile(r'\[(\w+)\]\((https?://\w+\.\w+)\)')
+        #emails to masked
+        self.email = re.compile(r"\w+@\w+\.\w+")
+        #phone numbers to formatted
+        self.phone = re.compile(r"\d{10}")
+    def process(self, text):
+        result = re.sub(self.URL, r'<a href="\2">\1</a>', text)
+        result = re.sub(self.email, r'\1***\3', result)
+        result = re.sub(self.phone, r"(\1) \2-\3", result)
+        return result

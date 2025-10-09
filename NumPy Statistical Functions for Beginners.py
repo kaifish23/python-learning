@@ -8,7 +8,7 @@ print("NumPy version:", np.__version__)
 #Key Operations Review
 #Array Creation
 arr = np.array([1, 2, 3, 4, 5]) #from list
-arr = np.arange(10)              #numbers 0-9
+arr = np.arange(10)             #numbers 0-9
 arr = np.linspace(0, 10, 5)     #5 points from 0 to 10
 #Indexing and Slicing
 arr[0] #first element
