@@ -7,7 +7,7 @@
     #Data Sharing: exchange information
     #Handle Large Data: process data too big for memory
     #Real-World Applications
-
+'''
 #Student Practice
 #Exercise 1a: Beginner - Understanding File Concepts
 def practice_1_beginner():
@@ -292,7 +292,7 @@ def practice_3_intermediate():
     for i, task in enumerate(lines, 1):
         print(f"{i}. {task.strip()}")
 practice_3_intermediate()
-
+'''
 #Exercise 3c: Advanced - Seek Operations
 def practice_3_advanced():
     print("\n" + "="*50)
@@ -333,3 +333,324 @@ def practice_3_advanced():
         print(f"{name} (pos {position}): {content}")
     positions_file.close()
 practice_3_advanced()
+
+#Week 7 Lecture 2: Unit 1: Working with File Formats
+#Common Text-Based Formats
+    #Plain Text (.txt)
+        #Simple and human-readable
+        #No formatting
+        #Universal compatibility
+    #Comma-Separated Values (.csv)
+        #Tabular data in text form
+        #Rows and columns
+        #Used by Excel databases
+    #JavaScript Object Notation (.json)
+        #Structured data format
+        #Human and machine-readable
+        #Standard for web APIs
+
+#Student Practice
+#Set 1: Beginner - Text to CSV
+def practice_1a_beginner():
+    print("\n" + "="*50)
+    print("Exercise 1.1: Text to CSV Converter")
+    print("="*50)
+    #Create a text file with data
+    with open("employees.txt", "w") as employees:
+        employees.write("John Smith 35 Engineer\n")
+        employees.write("Jane Doe 28 Designer\n")
+        employees.write("Bob Johnson 42 Manager\n")
+    #Read text file and convert to CSV
+    with open("employees.txt", "r") as employees:
+        with open("employees.csv", "w") as employees_csv: 
+            #Write CSV header
+            employees_csv.write("First,Last,Age,Job\n")
+            #Read each line and convert
+            for line in employees: 
+                parts = line.strip().split()
+                first = parts[0]
+                last = parts[1]
+                age = parts[2]
+                job = parts[3]
+                #Write as CSV line
+                csv_line = f"{first},{last},{age},{job}"
+                employees_csv.write(csv_line + "\n")
+    #Read and verify CSV
+    print("\nCSV Contents:")
+    with open("employees.csv", "r") as employees_csv:
+        for line in employees_csv:
+            print(line.strip())
+practice_1a_beginner()
+
+#Set 2: Intermediate - CSV Processing
+def practice_2a_intermediate():
+    print("\n" + "="*50)
+    print("Exercise 1.2: Grade Calculator")
+    print("="*50)
+    #Create grades CSV
+    with open("grades.csv", "w") as grades:
+        grades.write("Student,Math,Science,English\n")
+        grades.write("Alice,95,87,92\n")
+        grades.write("Bob,78,85,88\n")
+        grades.write("Charlie,92,94,85\n")
+        grades.write("Diana,88,91,95\n")
+    #Read CSV and calculate averages
+    with open("grades.csv", "r") as grades:
+        header = grades.readline().strip().split(",")
+        print(f"Subjects: {header[1:]}")
+        student_averages = []
+        for line in grades: 
+            parts = line.strip().split(",")
+            name = parts[0]
+            #Convert grades to numbers
+            grades_list = [int(score) for score in parts[1:]]
+            #Calculate average
+            average = sum(grades_list) / len(grades_list)
+            student_averages.append((name, average))
+            print(f"{name}: {average:.1f}")
+    #Save results to new CSV
+    with open("averages.csv", "w") as averages: 
+        averages.write("Student,Average\n")
+        #Write each student's average
+        for name, avg in student_averages:
+            averages.write(f"{name},{avg:.1f}\n")
+practice_2a_intermediate()
+
+#Set 3: Advanced - JSON Data Manager
+def practice_3a_advanced():
+    print("\n" + "="*50)
+    print("Exercise 1.3: JSON Database")
+    print("="*50)
+    import json 
+    #Create a product database in JSON
+    products = {
+        "inventory": [
+            {"id": 1, "name": "Laptop", "price": 999.99, "stock": 5},
+            {"id": 2, "name": "Mouse", "price": 29.99, "stock": 15},
+            {"id": 3, "name": "Keyboard", "price": 79.99, "stock": 8}
+        ],
+        "last_updated": "2024-01-15",
+        "store": "Tech Store"
+    }
+    #Save to JSON
+    with open("products.json", "w") as file:
+        json.dump(products, file, indent=4)
+    print("Product database created")
+    #Load and modify JSON
+    with open("products.json", "r") as file:
+        data = json.load(file)
+    #Add a new product
+    new_product = {
+        "id": 4,
+        "name": "Monitor",
+        "price": 299.99,
+        "stock": 3
+    }
+    #Add to inventory
+    data["inventory"].append(new_product)
+    print("New product added: Monitor")
+    #Update stock levels
+    for item in data["inventory"]:
+        if item["name"] == "Mouse":
+            item["stock"] += 5
+        elif item["name"] ==  "Laptop":
+            item["stock"] -= 1
+    #Save updated data
+    with open("products.json", "w") as file:
+        json.dump(data, file, indent=4)
+    print("Updated product database saved.")
+    #Generate report from JSON
+    print("\nInventory Report:")
+    total_value = 0
+    for item in data["inventory"]:
+        item_value = item["price"] * item["stock"]
+        total_value += item_value
+        print(f"{item['name']}: {item['stock']} in stock (${item_value:.2f} value)")
+practice_3a_advanced()
+
+#Week 7 Lecture 2: Unit 2: JSON Serialization
+#Serialization: Converting Python objects to a format that can be stored or transmitted (pack)
+#Deserialization: Converting stored data back to Python objects (unpack)
+#JSON Module Methods
+    #Serialize to string 
+        #json.dumps(obj)       = Object to JSON string
+    #Serialize to file
+        #json.dump(onj, file) = Object to JSON file
+    #Deserialize from string
+        #json.loads(string)    = JSON string to object
+    #Deserialize from file
+        #json.load(file)       = JSON file to object
+#Python to JSON conversion
+    #dict -> object
+    #list, tuple -> array
+    #str -> string
+    #int, float -> number
+    #True/False -> true/false
+    #None -> null
+#JSON Formatting Options
+    #Pretty Printing
+        #json.dump(data, file, indent=4) = Indented output
+    #Sorting Keys
+        #json.dump(data, file, sort_keys=True)
+    #Compact output
+        #json.dump(data, file, separators=(',', ':'))
+
+#Student Practice
+#Set 1: Beginner - JSON Basics
+def practice_1b_beginner():
+    print("\n" + "="*50)
+    print("Exercise 2.1: JSON Contact Card")
+    print("="*50)    
+    import json 
+    #Create a contact dictionary
+    contact = {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "phone": "555-1234",
+        "age": 25
+    }
+    #Convert to JSON string
+    json_str = json.dumps(contact)
+    print(f"JSON String: {json_str}")
+    #Save to file
+    with open("contact.json", "w") as c: 
+        json.dump(contact, c, indent=4)
+    print("Contact saved to file")
+    #Load from file 
+    with open("contact.json", "r") as c:
+        loaded_contact = json.load(c)
+    #Access data
+    print(f"\nLoaded contact:")
+    print(f"Name: {loaded_contact['name']}")
+    print(f"Email: {loaded_contact['email']}")
+practice_1b_beginner()
+
+#Set 2: Intermediate - Settings Manager
+def practice_2b_intermediate():
+    print("\n" + "="*50)
+    print("Exercise 2.2: Settings Manager")
+    print("="*50)
+    import json
+    #Default settings
+    default_settings = {
+        "app_name": "My App",
+        "version": "1.0.0",
+        "user_preferences": {
+            "theme": "dark",
+            "font_size": 12,
+            "auto_save": True
+        },
+        "recent_files": [],
+        "window_size": [800, 600]
+    }
+    #Save default settings
+    with open("settings.json", "w") as settings_json:
+        json.dump(default_settings, settings_json, indent=4)
+    print("Default settings created")
+    #Load and modify settings
+    with open("settings.json", "r") as settings_json:
+        settings = json.load(settings_json)
+    #Save updated settings
+    with open("settings.json", "w") as settings_json:
+        json.dump(settings, settings_json, indent=4)
+    #Create backup
+    with open("settings.json", "r") as settings_json:
+        backup_data = settings_json.read()
+    with open("settings_backup.json", "w") as settings_backup:
+        settings_backup.write(backup_data)
+    print("Settings backed up")
+practice_2b_intermediate()
+
+#Week 7 Lecture 2: Unit 3: Pickle and File Paths
+#What is Pickle?
+    #Python-specific serialization
+    #Can save ANY Python object
+    #Binary format (not human-readable)
+    #Use when JSON isn't enough
+#File Paths
+    #Absolute Path: Complete path from root
+        #Windows: C:\Users\John\Documents\file.txt
+        #Unix/Linux: /home/john/documents/file.txt
+    #Relative Path: Path from current location
+        #./file.txt      = current directory
+        #../file.txt     = parent directory
+        #folder/file.txt = subdirectory
+#Path Differences
+    #Windows vs Unix/Linux:
+        #Windows: \
+        #Unix/Linux: /
+        #Python accepts both or use: os.path.join()
+#Pathlib (Modern Approach)
+    #Path operations
+        #path.exists()  = check if path exists
+        #path.is_file() = check if it is a file
+        #path.is_dir()  = check if it is a directory
+        #path.parent    = get parent directory 
+        
+#Student Practice
+#Set 1: Beginner - Simple Pickle
+def practice_1c_beginner():
+    print("\n" + "="*50)
+    print("Exercise 3.1: Pickle Basics")
+    print("="*50)
+    import pickle
+    #Create a list to pickle
+    shopping_list = ["Apples", "Bananas", "Milk", "Bread"]
+    #Save with pickle
+    with open("shopping.pkl", "wb") as shop:
+        pickle.dump(shopping_list, shop)
+    print("Shopping list pickled!")
+    #Load with pickle
+    with open("shopping.pkl", "rb") as shop:
+        loaded_list = pickle.load(shop)
+    print(f"Loaded list: {loaded_list}")
+    #Add items and re-save
+    loaded_list.append("Eggs")
+    loaded_list.append("Cheese")
+    with open("shopping.pkl", "wb") as shop:
+        pickle.dump(loaded_list, shop)
+    print("Updated list saved")
+practice_1c_beginner()
+
+#Set 2: Intermediate - Path Operations
+def practice_2c_intermediate():
+    print("\n" + "="*50)
+    print("Exercise 3.2: File Navigator")
+    print("="*50)
+    import os
+    from pathlib import Path
+    #Get current directory
+    current = Path.cwd()
+    print(f"Current directory: {current}")
+    #Create file paths
+    #Relative path
+    rel_path = "data/file.txt"
+    #Absolute path
+    abs_path = "/home/john/documents/file.txt"
+    print(f"Relative: {rel_path}")
+    print(f"Absolute: {abs_path}")
+    #Check multiple files
+    files_to_check = [
+        "students.pkl",
+        "data.json",
+        "nonexistent.txt"
+    ]
+    print("\nFile Check:")
+    for filename in files_to_check:
+        exists = os.path.exists(filename)
+        #Print status
+        print(f"{filename}: {'Found' if exists else 'Not Found'}")
+    #Use pathlib
+    path = Path("test_file.txt")
+    #Create the file
+    if not path.exists():
+        path.write_text("Hello, this is a test file!")
+        print(f"Created: {path.name}")
+    else:
+        print(f"File already exists: {path.name}")
+    #Check path properties
+    print(f"Exists: {path.exists()}")
+    print(f"Absolute path: {path.resolve()}")
+    print(f"File name: {path.name}")
+    print(f"Parent directory: {path.parent}")
+practice_2c_intermediate()
