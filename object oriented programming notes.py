@@ -1242,3 +1242,493 @@ app1.alert_user("You have a new message!")
 app2.alert_user("Your verification code is 1234.")
 print("="*25)
 
+#Week 4 - Lecture 5 - Unit 1: Class Methods
+#Methods for the class
+    #Bound to the class, not the instance
+    #Use @classmethod decorator
+    #First parameter is "cls"
+#When to use Class Methods
+    #Alternative ways to create objects
+    #Working with class-level data
+    #Factory methods (creating objects)
+    #Operations that affect the entire class
+    #When you need access to class but not instance
+#Key Points
+    #Called on class: ClassName.method()
+    #Can also be called on instances
+    #Inherited by subclasses
+
+#Student Practice
+#Beginner - Person from birth year
+from datetime import datetime
+class Person:
+    #create person with from_birth_year class method
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    @classmethod
+    def from_birth_year(cls, name, birth_year):
+        #calculate age from birth_year
+        current_year = datetime.now().year
+        age = current_year - birth_year
+        return cls(name, age)
+#test
+person = Person.from_birth_year("Alice", 2000)
+print(f"{person.name} is {person.age} years old")
+print("="*25)
+
+#Intermediate - Config from File
+import json
+class Config:
+    #load configuration from different sources
+    def __init__(self, host, port, debug):
+        self.host = host
+        self.port = port
+        self.debug = debug
+    @classmethod
+    def from_json_string(cls, json_str):
+        #parse json-like string
+        json_str = json_str.replace("'", '"')
+        data = json.loads(json_str)
+        return cls(data["host"], data["port"], data["debug"])
+    @classmethod
+    def default_config(cls):
+        #return config with default values
+        return cls("localhost", 8080, False)
+    def __str__(self):
+        return f"Config(host={self.host}, port={self.port}, debug={self.debug})"
+#test
+json_str = "{'host': '127.0.0.1', 'port': 5000, 'debug': true}"
+config1 = Config.from_json_string(json_str)
+print(config1)
+config2 = Config.default_config()
+print(config2)
+print("="*25)
+
+#Advanced - Database Model
+class User:
+    user_count = 0
+    #create model that loads from database
+    def __init__(self, username, email):
+        self.username = username
+        self.email = email
+        User.user_count += 1
+    @classmethod
+    def from_database_row(cls, row):
+        #row is a tuple
+        username, email = row
+        return cls(username, email)
+    @classmethod
+    def create_guest(cls):
+        #create guest user with generated names
+        guest_name = f"guest_{cls.user_count + 1:03}"
+        guest_email = f"{guest_name}@example.com"
+        return cls(guest_name, guest_email)
+    @classmethod
+    def get_total_users(cls):
+        return cls.user_count
+    def __str__(self):
+        return f"User(username='{self.username}', email='{self.email}')"
+#test
+user1 = User.from_database_row(('alice', 'alice@email.com'))
+print(user1)
+guest1 = User.create_guest()
+guest2 = User.create_guest()
+print(guest1)
+print(guest2)
+print("Total users:", User.get_total_users())
+print("="*25)
+
+#Week 4 - Lecture 5 - Unit 2: Static Methods
+#Static Method
+    #Not bound to class or instance
+    #Takes no required parameters like "self" or "cls"
+    #Is decorated with @staticmethod
+    #Is a function that belongs logically to the class but does not interact with the data (self, cls)
+#When to use Static Methods?
+    #Utility functions related to the class
+    #Operations that don't need class or instance data like validation functions
+    #Helper methods that don't need object data
+#Key Points
+    #Called on class or instance
+    #Cannot access class or instance variables
+    #Good for organization
+    
+#Student Practice
+#Beginner - Email Validator
+class EmailValidator:
+    #create static email validation
+    @staticmethod
+    def is_valid_email(email):
+        #check has @ and .
+        if "@" in email:
+            return True
+        parts = email.split('@')
+        if len(parts) != 2:
+            return False
+    @staticmethod
+    def get_domain(email):
+        #return part after @ or None if invalid
+        if not EmailValidator.is_valid_email(email):
+            return None
+        return email.split("@")[1]
+#test
+print(EmailValidator.is_valid_email("test@gmail.com"))
+print(EmailValidator.get_domain("user@example.org"))
+print("="*25)
+
+#Intermediate - File Utilities
+class FileHelper:
+    #File Helper static methods
+    @staticmethod
+    def get_extension(filename):
+        #return file extension (after ".")
+        if "." in filename:
+            return filename.split(".")[-1].lower()
+        return ""
+    @staticmethod
+    def is_image(filename):
+        #check if jpg, png, gif
+        ext = FileHelper.get_extension(filename)
+        return ext in ("jpg", "png", "gif")
+    @staticmethod
+    def make_safe_filename(text):
+        #replace spaces with underscore
+        #remove special characters
+        safe = ""
+        for char in text:
+            if char.isalnum() or char in ("_", "-", "."):
+                safe += char
+            elif char == " ":
+                safe += "_"
+        return safe
+#test
+print(FileHelper.get_extension("photo.png"))
+print(FileHelper.is_image("holiday.jpg"))
+print(FileHelper.is_image("report.pdf"))
+print(FileHelper.make_safe_filename("My File @ 2025!.jpg"))
+print("="*25)
+
+#Week 4 - Lecture 5 - Unit 3: Method Types Comparison
+#Three Types of Methods
+    #Instance Methods
+        #Needs instance data, use "self"
+        #You need "self" (object's data)
+        #Different for each object
+        #Most common method
+    #Class Methods
+        #Needs class data, use "cls"
+        #You need "cls" (the class itself)
+        #Alternative constructors
+        #Working with class variables
+    #Static Methods
+        #Need neither, no special parameters
+        #Don't need "self" OR "cls"
+        #Utility/helper functions
+        #Could be standalone but related to class
+#Memory Considerations
+    #Feature | Instance Method | Class Method | Static Method
+        #First Arg  | self                     | cls               | none
+        #Access     | instance attributes      | class variables   | neither
+        #Use case   | Object-specific behavior | alt. constructors | utility/helper functions
+        #Decoration | None                     | @classmethod      | @staticmethod
+
+#Student Practice
+#Beginner - Mixed Methods
+class Temperature:
+    #create class with all 3 types
+    #Instance (self)
+    def __init__(self, celsius):
+        self.celsius = celsius
+    def to_fahrenheit(self):
+        #convert C to F
+        return self.celsius * 9/5 + 32
+    #Class Method
+    @classmethod
+    def from_fahrenheit(cls, fahrenheit):
+        #convert F to C
+        celsius = (fahrenheit - 32) * 5/9
+        return cls(celsius)
+    #Static Method
+    @staticmethod
+    def is_freezing(celsius):
+        return celsius <= 0
+#test
+temp1 = Temperature(0)
+print(temp1.to_fahrenheit())                
+print(Temperature.is_freezing(temp1.celsius)) 
+temp2 = Temperature.from_fahrenheit(212)
+print(temp2.celsius)                        
+print(temp2.to_fahrenheit())              
+print("="*25)
+
+#Intermediate - User System
+class User:
+    #user management with mixed methods
+    all_users = []
+    def __init__(self, username):
+        self.username = username
+        self.logged_in = False
+        User.all_users.append(self)
+    #Instance method
+    def login(self, password):
+        #set logged_in to True if password is "secret"
+        if password == "secret":
+            self.logged_in = True
+        else:
+            print("Wrong password")
+    #Class Method
+    @classmethod
+    def get_active_users(cls):
+        #return list of logged-in users
+        return [user.username for user in cls.all_users if user.logged_in]
+    #Static Method
+    @staticmethod
+    def validate_username(username):
+        #check 3-20 chars, alphanumeric only
+        return 3 <= len(username) <= 20 and username.isalnum()
+#test
+print(User.validate_username("Kai123"))
+user1 = User("Alice")
+user2 = User("Bob")
+user1.login("secret")
+user2.login("secret")
+print(User.get_active_users())
+print("="*25)
+
+#Week 4 - Lecture 5 - Unit 4: Factory Method Pattern
+#Factory Method
+    #Problem: the "__init__" must always take a fixed set of arguments. What if you want diff formats?
+    #Solution: Factory Method is a class method that creates and returns an instance of the class
+    #Naming Convention: starts with "from_" (eg from_string, from_dict, etc.)
+#Factory Pattern
+    #Creational pattern for creating objects
+    #Centralize object creation logic
+    #Hide implementation details from client
+    #Can return different subclasses based on input
+#Types of Factories
+    #Factory Methods: Class methods that create objects
+    #Static Factory Methods: Static Methods for object creation
+    #Alternative Constructors: Multiple ways to create same object type
+
+#Student Practice
+#Beginner - Animal Factory
+class Animal:
+    #create animal factory
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return "Woof!"
+    
+class Cat(Animal):
+    def speak(self):
+        return "Meow!"
+    
+class AnimalFactory:
+    @staticmethod
+    def create_animal(animal_type):
+        if animal_type == "dog":
+            return Dog()
+        elif animal_type == "cat":
+            return Cat()
+        else:
+            print("Unknown animal type")
+            return None
+#test
+pet1 = AnimalFactory.create_animal("dog")
+pet2= AnimalFactory.create_animal("cat")
+print(pet1.speak())
+print(pet2.speak())
+print("="*25)
+
+#Week 4 - Lecture 6 - Unit 1: Essential Magic Methods
+#Magic Methods
+    #AKA "Dunder" methods
+    #Special Methods: Methods that have double underscores at the start and end
+    #Purpose: They allow your objects to integrate seamlessly with built-in Python language features
+    #Example: When you call "len(my_list)", Python is secretly calling the "my_list.__len__()" method
+    #Most Important Methods:
+        #__init__    = Called when creating object
+        #__str__     = Called by print()
+        #__repr__    = Called by repr() - for debugging
+        #__len__     = Called by len()
+        #__bool__    = Called by if statements
+        #__getitem__ = indexing support
+
+#Student Practice
+#Beginner - Book with str
+class Book:
+    #add __str__
+    def __init__(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+    def __str__(self):
+        return f"{self.title} by {self.author} has {self.pages} pages"
+#test
+book = Book("Python 101", "Jane Doe", 250)
+print(book)
+print("="*25)
+
+#Week 4 - Lecture 6 - Unit 2: Arithmetic Operator Overloading
+#Common Arithmetic Magic Methods
+    #Arithmetic Operators
+        #+  = __add__, __radd__
+        #-  = __sub__, __rsub__
+        #*  = __mul__, __rmul__
+        #/  = __truediv__
+        #// = __floordiv__
+        #%  = __mod__
+    #Right-side Methods
+        #__radd__ handles other + obj when obj doesnt support "+"
+        #ensures operations work both ways
+    #In-place Operators
+        #+= -> __iadd__
+        #-= -> __isub__
+
+#Student Practice
+#Beginner - Money class
+class Money:
+    #add money with "+"" operator
+    def __init__(self, dollars):
+        self.dollars = dollars
+    def __str__(self):
+        return f"${self.dollars:.2f}"
+    def __add__(self, other):
+        total = self.dollars + other.dollars
+        return Money(total)
+#test
+m1 = Money(10.50)
+m2 = Money(5.25)
+m3 = m1 + m2
+print(m3)
+print("="*25)
+
+#Intermediate - Fraction Arithmetic
+class Fraction:
+    def __init__(self, numerator, denominator):
+        self.num = numerator
+        self.den = denominator
+    def __str__(self):
+        return f"{self.num}/{self.den}"
+    def __add__(self, other):
+        #add fractions: a/b + c/d = (a*d + b*c)/(b*d)
+        new_num = self.num * other.den + self.den * other.num
+        new_den = self.den * other.den
+        return Fraction(new_num, new_den)
+    def __mul__(self, other):
+        #multiply: a/b * c/d = (a*c)/(b*d)
+        new_num = self.num * other.num
+        new_den = self.den * other.den
+        return Fraction(new_num, new_den)
+#test
+f1 = Fraction(1 ,2)
+f2 = Fraction(1, 3)
+print(f1 + f2)
+print(f1 * f2)
+print("="*25)
+
+#Week 4 - Lecture 6 - Unit 3: Overloading Comparison Operators
+#Comparison Magic Methods
+    #Methods
+        #__eq__ : ==
+        #__ne__ : !=
+        #__lt__ : <
+        #__le__ : <=
+        #__gt__ : >
+        #__ge__ : >=
+    #Purpose: to define how objects of your class are compared using operators like ==, >, <, etc.
+    #Rule: these methofs must return a boolean value (true/false)
+    #Hashable Objects: if __eq__ defined, should define __hash__ also
+    
+#Student Practice
+#Beginner - Score Comparison
+class Score:
+    #compare game scores
+    def __init__(self, points):
+        self.points = points
+    def __str__(self):
+        return f"Score: {self.points}"
+    def __eq__(self, other):
+        #return true if points are equal
+        if self.points == other.points:
+            return True
+        else:
+            print("Scores are not equal")
+    def __lt__(self, other):
+        #return true if less points
+        if self.points < other.points:
+            return True
+        else:
+            return False
+#test
+s1 = Score(100)
+s2 = Score(85)
+print(s1 > s2)
+print("="*25)
+
+#Week 4 - Lecture 6 - Unit 4: Container Protocols
+#Methods:
+    #__getitem__  : indexing   : obj[key]
+    #__setitem__  : assignment : obj[key] = value
+    #__delitem__  : deletion   : del obj[key]
+    #__contains__ : itermation : for item in obj
+#Sequence Protocols:
+    #__len__      = implements the len() functions
+    #__getitem__  = implements the bracket notation for indexing/slicing
+    #__iter__     = allows your object to be used in a for loop
+    #__reversed__ = reverse iteration
+#Making classes iterable
+    #Implement "__iter__" returning iterator
+    #or __getitem__ with sequential indexing
+    
+#Student Practice
+#Beginner - Simple Gradebook
+class SimpleGrades:
+    #basic indexing
+    def __init__(self):
+        self.grades = {}
+    def __getitem__(self, name):
+        #return grade or 0 if not found
+        return self.grades.get(name, 0)
+    def __setitem__(self, name, grade):
+        #store the grade
+        self.grades[name] = grade
+#test
+book = SimpleGrades()
+book["Alice"] = 95
+book["John"] = 79
+print(book["Alice"])
+print(book["John"])
+print("="*25)
+
+#Intermediate - Cache with access
+class Cache:
+    def __init__(self, max_size=3):
+        self.data = {}
+        self.max_size = max_size
+    def __getitem__(self, key):
+        #return value or None
+        return self.data.get(key, None)
+    def __setitem__(self, key, value):
+        #add to cache, if full remove oldest item
+        if len(self.data) >= self.max_size and key not in self.data:
+            oldest_key = next(iter(self.data))
+            del self.data[oldest_key]
+        self.data[key] = value
+    def __contains__(self, key):
+        return key in self.data
+
+#Week 4 - Lecture 6 - Unit 5: Context Managers
+#Context Managers:
+    #__enter__ = called when entering with block
+    #__exit__  = called when exiting with block
+#Other Useful Magic Methods
+    #__getattr__ = attribute access fallback
+    #__setattr__ = attribute assignment
+    #__call__    = make objects callable
+#Advanced Protocols
+    #__getattribute__ = all attribtues access
+    #__getattr__ = only when attribute not found
